@@ -1,0 +1,19 @@
+name: PR Review Validation
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  enforce-reviewer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for Assigned Reviewers
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr.requested_reviewers || pr.requested_reviewers.length === 0) {
+              core.setFailed("At least one reviewer must be assigned before merging.");
+            }
